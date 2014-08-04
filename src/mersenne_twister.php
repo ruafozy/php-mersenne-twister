@@ -231,6 +231,8 @@ class twister {
     $lower_bound = intval($lower_bound);
     $upper_bound = intval($upper_bound);
 
+    $this->check_bounds($lower_bound, $upper_bound);
+
     if($this->bits32) {
       $pow_2_32 = pow(2, 32);
 
@@ -299,6 +301,8 @@ class twister {
   */
 
   function rangereal_open($lower_bound, $upper_bound) {
+    $this->check_bounds($lower_bound, $upper_bound);
+
     do {
       $rand = $lower_bound +
 	$this->real_open() * ($upper_bound - $lower_bound);
@@ -308,6 +312,8 @@ class twister {
   }
 
   function rangereal_halfopen($lower_bound, $upper_bound) {
+    $this->check_bounds($lower_bound, $upper_bound);
+
     do {
       $rand = $lower_bound +
 	$this->real_halfopen() * ($upper_bound - $lower_bound);
@@ -321,6 +327,8 @@ class twister {
   }
 
   function rangereal_halfopen2($lower_bound, $upper_bound) {
+    $this->check_bounds($lower_bound, $upper_bound);
+
     do {
       $rand = $lower_bound +
 	$this->real_halfopen2() * ($upper_bound - $lower_bound);
@@ -336,6 +344,15 @@ class twister {
 
     if(md5($output) !== "cb33e6acc162cbe20f7fcac26adddd02") {
       print "Test failed.\n";
+    }
+  }
+
+  private function check_bounds($lower_bound, $upper_bound) {
+    if($lower_bound > $upper_bound) {
+      $message =
+        'lower bound exceeds upper bound: ' .
+          "$lower_bound > $upper_bound";
+      throw new Exception($message);
     }
   }
 
