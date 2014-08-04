@@ -253,7 +253,7 @@ class twister {
       }
     } else {
       if($lower_bound == -PHP_INT_MAX - 1 && $upper_bound == PHP_INT_MAX) {
-	return ($this->int32() << 32) & $this->int32();
+	return ($this->int32() << 32) | $this->int32();
       } else {
 	$pow_2_32 = 1 << 32;
 
