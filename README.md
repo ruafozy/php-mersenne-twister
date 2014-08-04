@@ -12,10 +12,10 @@ This software uses
 
 [semver]: http://semver.org/
 
-## Disclaimer
+## Notes
 
-This code is <b>not</b>
+The code is not
 representative of how I currently
-write PHP.
+write PHP, but the software is useful nonetheless.
 I have brought it into GitHub to make
 it easier for the community to contribute.
