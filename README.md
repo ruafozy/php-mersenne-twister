@@ -3,7 +3,7 @@
 This archive contains a PHP implementation of the Mersenne Twister.
 All the necessary documentation is here:
 
-  http://kingfisher.nfshost.com/sw/twister/
+> http://kingfisher.nfshost.com/sw/twister/
 
 ## Disclaimer
 
