@@ -5,6 +5,13 @@ All the necessary documentation is here:
 
 > http://kingfisher.nfshost.com/sw/twister/
 
+## Versioning
+
+This software uses
+[Semantic Versioning][semver].
+
+[semver]: http://semver.org/
+
 ## Disclaimer
 
 Please note that this code is <b>not</b>
