@@ -1,0 +1,247 @@
+This document explains why the function `sub' in the file
+mersenne_twister.php works.
+
+Suppose we want to calculate a - b, where a and b are integers and
+
+  0 <= a <= 2**31 - 1
+  0 <= b <= 2**31 - 1
+
+("**" is the exponentiation operator; it binds more tightly than unary
+minus, so that, for example, -2**31 means -(2**31) and not (-2)**31.)
+
+Does `sub' do that?  Yes, as the following reasoning shows.
+
+With a and b as above, let a1, a2, b1, b2 be integers such that
+
+  a = a1 + a2,
+  b = b1 + b2,
+
+where
+
+  a1 = 0 or 2**31,
+  b1 = 0 or 2**31,
+  0 <= a2 < 2**31,
+  0 <= b2 < 2**31.
+
+Let the notation <x, y>, where x is 0 or 1 and y is an integer such that
+0 <= y < 2**31, denote PHP's representation of a signed two's-complement
+integer on a 32-bit machine.  For any such integer, x is the value of
+the MSB (i.e. the Most Significant Bit), and equals 1 if and only if
+the integer is negative.  y is the number formed by taking the 31 least
+significant bits and treating them as an unsigned binary number.
+
+Now, it is clear that
+
+  a - b = (a1 - b1) + (a2 - b2)
+
+It is also clear that any possible value of a2 - b2 can be represented
+in a PHP integer.
+
+Finally, identifying a and b here with $a and $b in the parameters of
+`sub', and considering the bit representation of the result of the
+expression (($a & MASK31) - ($b & MASK31)), which expression appears
+in the body of `sub', it can be seen that that the "top-level" xor in
+`sub', if it changes anything at all in the representation, does nothing
+but flip the MSB, and that the MSB is flipped if and only if a1 != b1.
+
+Now, it is clear that for any a1 and b1, we must have exactly one of
+the following 3 cases:
+
+  a1 < b1
+  a1 = b1
+  a1 > b1
+
+Also, it is clear that for any a2 and b2, we must have exactly one of
+the following 2 cases:
+
+  a2 < b2
+  a2 >= b2
+
+Combining these 2 facts, we see that for any a1, b1, a2, b2, we have
+exactly one of the following 6 cases:
+
+1) a1 < b1, a2 < b2
+2) a1 < b1, a2 >= b2
+3) a1 = b1, a2 < b2
+4) a1 = b1, a2 >= b2
+5) a1 > b1, a2 < b2
+6) a1 > b1, a2 >= b2
+
+To show that `sub' works, we need to consider each case in turn.
+Before doing so, we will introduce some more notation.
+
+For any x, let r(x) = z, where
+
+  0 <= z < 2**32,
+  z = x + n * 2**32,
+
+for some integer n.
+
+(Informally: r brings x inside the range of a 32-bit unsigned integer
+by adding or subtracting multiples of 2**32.)
+
+Let
+  f(z1, z2, <x, y>) =
+    <x, y> if z1 = z2,
+    <1 - x, y> otherwise.
+
+(Informally: f flips the MSB of its third argument if the first 2
+arguments of f are different.)
+
+Let u(<x, y>) = 2**31 * x + y.  (Informally: u takes PHP's representation
+of, a signed integer and calculates what its value would be if it were
+an unsigned integer.)
+
+Let i(z) denote PHP's concrete representation, as a signed integer,
+of the integer z.
+
+Now, for each of the above 6 cases, we need to show that
+
+  r(a - b) = u(f(a1, b1, i(a2 - b2))).                (1)
+
+This is because `sub' computes a2 - b2, which is then fed into the
+top-level xor, which proceeds to compute f(a1, b1, i(a2 - b2)).
+
+In what follows, it will be useful to recall the fact that a signed
+32-bit two's-complement integer is interpreted as
+
+  2**0 * x_0 + 2**1 * x_1 + ... +
+    2**29 * x_29 + 2**30 * x_30 + -2**31 * x_31,
+
+where x_i is the value of the bit at position i.  Note that the
+coefficient of x_31 is negative, all the other coefficients being
+positive.
+
+We shall now treat each of the above cases in turn.
+
+Case 1:
+  We are supposing:
+
+    a1 < b1, a2 < b2
+
+  So we have
+
+    -2**31 < a2 - b2 < 0
+
+  So 
+  
+    a2 - b2 = -2**31 + y
+
+  for some y such that 0 < y < 2**31.
+
+  Therefore i(a2 - b2) = <1, y>.
+
+  a1 - b1 = -2**31,
+  so a - b = (a1 - b1) + (a2 - b2) = -2**32 + y, so r(a - b) = y.
+
+  Since a1 != b1, the top-level xor will flip the MSB, so the function
+  returns <0, y>, so (1) holds.
+
+Case 2:
+  We are supposing:
+
+    a1 < b1, a2 >= b2
+
+  So we have:
+
+    0 <= a2 - b2 < 2**31
+    a1 - b1 = -2**31
+
+  a - b = (a1 - b1) + (a2 - b2) = -2**31 + a2 - b2
+
+  Therefore,
+
+    -2**31 <= a - b < 0
+
+  So
+    r(a - b) = 2**32 + a - b = 2**32 + (-2**31 + a2 - b2) = 2**31 + a2 - b2.
+
+  We have
+
+    i(a2 - b2) = <0, a2 - b2>.
+    
+  Since the top-level xor flips the MSB, we return <1, a2 - b2>,
+  and u(<1, a2 - b2>) = r(a - b), so (1) holds.
+
+Case 3:
+  We are supposing:
+
+    a1 = b1, a2 < b2
+
+  So we have:
+
+    -2**31 < a2 - b2 < 0
+    a - b = a2 - b2
+
+  Clearly,
+
+    a2 - b2 = -2**31 + y,
+
+  for some y such that 0 < y < 2**31.  So i(a2 - b2) = <1, y>.
+
+  We have:
+
+    r(a - b) = 2**32 + a2 - b2 = 2**31 + y
+
+  Since a1 = b1, the MSB will not be flipped in <1, y>,
+  and since r(a - b) = u(<1, y>), we will, by returning <1, y>, return the
+  correct answer.
+
+Case 4:
+  We are supposing:
+
+    a1 = b1, a2 >= b2
+
+  In this case, it is probably easy enough to see,
+  without performing the formal reasoning below, that
+  the code works.  However, we shall proceed.
+
+  We have:
+
+    0 <= a2 - b2 < 2**31
+    a - b = a2 - b2
+    r(a - b) = a2 - b2
+    i(a2 - b2) = <0, a2 - b2>.
+    r(a - b) = u(i(a2 - b2))
+
+  Since a1 = b1 the MSB is not changed,
+  so the function returns <0, a2 - b2>,
+  which is the desired answer.
+
+Case 5:
+  We are supposing:
+
+    a1 > b1, a2 < b2
+
+  We have:
+
+    -2**31 < a2 - b2 < 0
+
+  Clearly,
+
+    a2 - b2 = -2**31 + y,
+    
+  for some y such that 0 < y < 2**31.
+
+  Therefore, i(a2 - b2) = <1, y>.
+
+  a1 - b1 = 2**31, so a - b = y, so r(a - b) = y.
+  Since a1 != b1, the MSB in <1, y> will be flipped,
+  so we return <0, y>, which is the right answer,
+  because r(a - b) = u(<0, y>).
+
+Case 6:
+  We are supposing:
+
+    a1 > b1, a2 >= b2
+
+  We have:
+
+    0 <= a2 - b2 < 2**31
+    i(a2 - b2) = <0, a2 - b2>
+    a1 - b1 = 2**31
+    a - b = 2**31 + a2 - b2 = r(a - b)
+
+  Since a1 != b1, the MSB will be flipped, so we will
+  return <1, a2 - b2>, which is the right answer,
+  since r(a - b) = u(<1, a2 - b2>).
