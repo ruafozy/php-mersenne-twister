@@ -14,7 +14,7 @@ This software uses
 
 ## Disclaimer
 
-Please note that this code is <b>not</b>
+This code is <b>not</b>
 representative of how I currently
 write PHP.
 I have brought it into GitHub to make
