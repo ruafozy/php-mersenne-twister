@@ -21,6 +21,8 @@
 
 namespace mersenne_twister;
 
+use Exception;
+
 const N = 624;
 const M = 397;
 const MATRIX_A = 0x9908b0df;
