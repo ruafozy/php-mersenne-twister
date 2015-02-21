@@ -1,10 +1,9 @@
 <?php
 /*
-  Mersenne Twister, 1.1.0
-  -----------------------
+  Mersenne Twister
+  ----------------
 
-  This is an implementation of the Mersenne Twister.  The current version
-  number is 1.1.0.
+  This is an implementation of the Mersenne Twister.
 
   Much of the code here was derived from the C code in the file
   mt19937ar.c, which is in the archive mt19937ar.sep.tgz, available from
