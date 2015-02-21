@@ -1,9 +1,20 @@
 {
+  "name": "ruafozy/mersenne-twister",
+  "description": "Pure-PHP Mersenne Twister",
+  "homepage": "https://github.com/ruafozy/php-mersenne-twister",
+  "license": "MIT",
   "require": {
-    "php": ">= 5.3.0"
+    "php": ">=5.3.0"
   },
-
+  "autoload": {
+    "files": [
+      "src/mersenne_twister.php"
+    ]
+  },
   "require-dev": {
     "phpunit/phpunit": "~4.1.4"
-  }
+  },
+  "keywords": [
+    "PRNG", "random", "mersenne"
+  ]
 }

@@ -6,7 +6,6 @@
 <phpunit 
   strict="true"
   colors="true"
-  bootstrap="tests/phpunit/bootstrap.php"
 >
   <testsuites>
     <testsuite name="suite1">
