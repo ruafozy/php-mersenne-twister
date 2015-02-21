@@ -1,4 +1,4 @@
-I, being the author and sole copyright holder, hereby grant
-permission to use
-all files in this repository
-as if they were in the public domain.
+This software is made available under the terms
+of the [MIT Licence] [mit-lic].
+
+[mit-lic]: http://opensource.org/licenses/MIT
