@@ -1,4 +1,2 @@
-This software is made available under the terms
-of the [MIT Licence] [mit-lic].
-
-[mit-lic]: http://opensource.org/licenses/MIT
+Everything in this repository is under the Creative Commons [CC0 1.0
+licence](https://creativecommons.org/publicdomain/zero/1.0/).
