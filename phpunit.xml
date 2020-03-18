@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  strict="false"
-  strict="true"
--->
 <phpunit 
-  strict="true"
   colors="true"
 >
   <testsuites>

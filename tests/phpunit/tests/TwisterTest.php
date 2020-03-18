@@ -2,9 +2,10 @@
 namespace mersenne_twister;
 
 use Exception;
+use PHPUnit\Framework\TestCase;
 
-class TwisterTest extends \PHPUnit_Framework_TestCase {
-  public function setUp() {
+class TwisterTest extends TestCase {
+  public function setUp(): void {
     $this->twister = new twister(42);
   }
 
