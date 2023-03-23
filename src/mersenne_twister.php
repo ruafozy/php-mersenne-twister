@@ -55,6 +55,15 @@ class twister {
   # the class constant is not used anywhere in this namespace,
   # but it makes the API cleaner.
 
+  /** @var bool $bits32 Whether we're running 32 bits or not */
+  public $bits32;
+
+  /** @var array */
+  public $mt;
+
+  /** @var int */
+  public $mti;
+
   function __construct() {
     $this->bits32 = PHP_INT_MAX == 2147483647;
 
@@ -143,7 +152,7 @@ class twister {
     foreach ($filenames as $filename) {
       $contents =
 	file_get_contents($filename, FALSE, NULL, 0,
-	  $limit_applies? $limit - strlen($data): -1);
+	  $limit_applies? $limit - strlen($data): NULL);
 
       if($contents === FALSE) {
 	throw new Exception("problem reading from $filename");
