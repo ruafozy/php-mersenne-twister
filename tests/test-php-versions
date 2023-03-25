@@ -11,6 +11,9 @@ main() {
   versions='
     7.3.33
     7.4.33
+    8.0.28
+    8.1.17
+    8.2.4
   '
 
   base_docker_tag=tmp-8049:tmp
