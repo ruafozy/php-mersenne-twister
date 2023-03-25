@@ -1,0 +1,65 @@
+#!/bin/bash
+
+# This script runs our tests in various PHP minor releases.
+# To run the script, Docker is required.
+
+main() {
+  local versions
+
+  cd "$(dirname "$0")"/..
+
+  versions='
+    7.3.33
+    7.4.33
+  '
+
+  base_docker_tag=tmp-8049:tmp
+  test_docker_tag=tmp-14933
+
+  generate_dockerfile_for_base_image "$v" |
+    docker build --quiet --file - --tag "$base_docker_tag" .
+
+  for v in $versions; do
+    echo Start of test with PHP version $v
+    generate_dockerfile_for_test_image "$base_docker_tag" "$v" |
+      docker build --quiet --file - --tag "$test_docker_tag" .
+    docker run --rm "$test_docker_tag" vendor/bin/phpunit -c phpunit.xml
+    echo End of test with PHP version $v
+    docker image rm "$test_docker_tag"
+    echo
+  done
+
+  docker image rm "$base_docker_tag"
+}
+
+generate_dockerfile_for_base_image() {
+  cat <<END_OF_DOCKERFILE
+FROM php:8.2.4-cli
+
+WORKDIR /mersenne
+
+COPY . .
+
+RUN curl --silent --show-error --insecure --output composer-setup.php https://getcomposer.org/installer
+RUN sha512sum --check --quiet tests/checksums
+RUN php composer-setup.php
+RUN rm composer-setup.php
+
+RUN env COMPOSER_ALLOW_SUPERUSER=1 php composer.phar
+END_OF_DOCKERFILE
+}
+
+generate_dockerfile_for_test_image() {
+  local base_docker_tag=$1 php_version=$2
+  cat <<END_OF_DOCKERFILE
+FROM $base_docker_tag AS base
+
+FROM php:${php_version}-cli
+
+WORKDIR /mersenne
+
+COPY --from=base /mersenne/ .
+END_OF_DOCKERFILE
+}
+
+main "$@"
